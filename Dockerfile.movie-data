@@ -1,0 +1,25 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies including RabbitMQ packages
+RUN npm install && \
+    npm install amqp-connection-manager @types/amqplib
+
+# Copy source code
+COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Create dist directory structure
+RUN mkdir -p /app/dist/microservices/movie-data
+
+# Expose port
+EXPOSE 3004
+
+# Start the movie data service
+CMD ["node", "dist/microservices/movie-data/main.js"] 
