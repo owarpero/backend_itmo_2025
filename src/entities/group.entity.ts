@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { IUser } from '../interfaces/entity.interfaces';
-import { User } from 'entities';
-
+import { User } from './user.entity';
 @Entity('groups')
 export class Group {
   @PrimaryGeneratedColumn('uuid')

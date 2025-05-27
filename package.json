@@ -8,6 +8,7 @@
     "start:movie-data": "ts-node src/microservices/movie-data/main.ts",
     "start:prod": "node dist/microservices/movie-matching/main.js",
     "start:dev": "nodemon",
+    "start:api": "node dist/main.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

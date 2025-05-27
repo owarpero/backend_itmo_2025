@@ -2,91 +2,65 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MovieMatch } from './entities/movie-match.entity';
-import { MovieMatchingController } from './movie-matching.controller';
-import { MovieMatchingService } from './movie-matching.service';
-import { RedisModule } from '../redis/redis.module';
-import rabbitmqConfig from '../../config/rabbitmq.config';
+
 import databaseConfig from '../../config/database.config';
 import redisConfig from '../../config/redis.config';
+import rabbitmqConfig from '../../config/rabbitmq.config';
+import { RedisModule } from '../redis/redis.module';
+
+import { MovieMatch } from './entities/movie-match.entity';
+import { MovieMatchingService } from './movie-matching.service';
+import { MovieMatchingController } from './movie-matching.controller';
 
 @Module({
   imports: [
-    // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [rabbitmqConfig, databaseConfig, redisConfig],
+      load: [databaseConfig, redisConfig, rabbitmqConfig],
     }),
 
-    // Database
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('POSTGRES_HOST'),
-        port: configService.get('POSTGRES_PORT'),
-        username: configService.get('POSTGRES_USER'),
-        password: configService.get('POSTGRES_PASSWORD'),
-        database: configService.get('POSTGRES_DB'),
-        entities: [MovieMatch],
-        synchronize: configService.get('NODE_ENV') !== 'production',
-      }),
+      useFactory: (cs: ConfigService) => cs.get('database'),
     }),
 
-    // Entity
     TypeOrmModule.forFeature([MovieMatch]),
-
-    // Redis
     RedisModule,
 
-    // RabbitMQ Clients
     ClientsModule.registerAsync([
       {
         name: 'USER_SERVICE',
+        imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) => {
-          const url = configService.get<string>('rabbitmq.url');
-          const queue = configService.get<string>(
-            'rabbitmq.queues.userService',
+        useFactory: (cs: ConfigService) => {
+          const rmq = cs.get<{ uri: string; queues: Record<string, string> }>(
+            'rabbitmq',
           );
-
-          if (!url || !queue) {
-            throw new Error('RabbitMQ configuration is incomplete');
-          }
-
           return {
             transport: Transport.RMQ,
             options: {
-              urls: [url],
-              queue,
-              queueOptions: {
-                durable: true,
-              },
+              urls: [rmq.uri],
+              queue: rmq.queues.userService,
+              queueOptions: { durable: true },
             },
           };
         },
       },
       {
         name: 'AUTH_SERVICE',
+        imports: [ConfigModule],
         inject: [ConfigService],
-        useFactory: (configService: ConfigService) => {
-          const url = configService.get<string>('rabbitmq.url');
-          const queue = configService.get<string>(
-            'rabbitmq.queues.authService',
+        useFactory: (cs: ConfigService) => {
+          const rmq = cs.get<{ uri: string; queues: Record<string, string> }>(
+            'rabbitmq',
           );
-
-          if (!url || !queue) {
-            throw new Error('RabbitMQ configuration is incomplete');
-          }
-
           return {
             transport: Transport.RMQ,
             options: {
-              urls: [url],
-              queue,
-              queueOptions: {
-                durable: true,
-              },
+              urls: [rmq.uri],
+              queue: rmq.queues.authService,
+              queueOptions: { durable: true },
             },
           };
         },

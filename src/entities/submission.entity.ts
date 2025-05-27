@@ -14,7 +14,10 @@ import {
   ITask,
   IAttachment,
 } from '../interfaces/entity.interfaces';
-import { Attachment, Task, User } from 'entities';
+
+import { User } from './user.entity';
+import { Task } from './task.entity';
+import { Attachment } from './attachment.entity';
 
 @Entity('submissions')
 export class Submission implements ISubmission {

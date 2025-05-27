@@ -9,8 +9,8 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 import { UserIdDto } from './dto/user.dto';
-import { User } from 'entities';
 
+import { User } from '../../entities/user.entity';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {

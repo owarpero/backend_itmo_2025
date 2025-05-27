@@ -1,22 +1,26 @@
-import { registerAs } from '@nestjs/config';
-
-export default registerAs('rabbitmq', () => ({
-  url: process.env.RABBITMQ_URL || 'amqp://localhost:5672',
-  queues: {
-    userService: 'user_service_queue',
-    authService: 'auth_service_queue',
-    movieMatchingService: 'movie_matching_service_queue',
+export default (): {
+  rabbitmq: {
+    uri: string;
+    queues: {
+      userService: string;
+      authService: string;
+      movieDataService: string;
+      movieMatchingService: string;
+    };
+  };
+} => ({
+  rabbitmq: {
+    uri: process.env.RABBITMQ_URI || process.env.RABBITMQ_URL,
+    queues: {
+      userService:
+        process.env.RABBITMQ_QUEUE_USER_SERVICE || 'user_service_queue',
+      authService:
+        process.env.RABBITMQ_QUEUE_AUTH_SERVICE || 'auth_service_queue',
+      movieDataService:
+        process.env.RABBITMQ_QUEUE_MOVIE_DATA_SERVICE || 'movie_data_queue',
+      movieMatchingService:
+        process.env.RABBITMQ_QUEUE_MOVIE_MATCHING_SERVICE ||
+        'movie_matching_queue',
+    },
   },
-  exchanges: {
-    userEvents: 'user_events',
-    matchEvents: 'match_events',
-    sessionEvents: 'session_events',
-  },
-  routingKeys: {
-    userCreated: 'user.created',
-    userUpdated: 'user.updated',
-    matchCreated: 'match.created',
-    sessionStarted: 'session.started',
-    sessionEnded: 'session.ended',
-  },
-}));
+});

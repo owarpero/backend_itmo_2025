@@ -1,3 +1,4 @@
+// src/modules/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -6,7 +7,6 @@ import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtConfig } from '../../config/auth.config';
 
 @Module({
   imports: [
@@ -14,18 +14,11 @@ import { JwtConfig } from '../../config/auth.config';
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const jwtConfig = configService.get<JwtConfig>('auth.jwt');
-        if (!jwtConfig?.secret) {
-          throw new Error(
-            'JWT secret is required. Set JWT_SECRET environment variable.',
-          );
-        }
+      useFactory: (cs: ConfigService) => {
+        const cfg = cs.get('auth.jwt');
         return {
-          secret: jwtConfig.secret,
-          signOptions: {
-            expiresIn: jwtConfig.expiresIn,
-          },
+          secret: cfg.secret,
+          signOptions: { expiresIn: cfg.expiresIn },
         };
       },
     }),

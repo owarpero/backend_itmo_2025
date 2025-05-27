@@ -1,35 +1,33 @@
-import { User } from 'entities';
+// src/entities/movie-match.entity.ts
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
+  PrimaryGeneratedColumn,
   ManyToOne,
-  CreateDateColumn,
   JoinColumn,
+  CreateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity('movie_matches')
 export class MovieMatch {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @Column({ name: 'tmdb_movie_id', type: 'int' })
+  tmdbMovieId: number;
+
+  @ManyToOne(() => User, user => user.matchesAsUser1, { eager: true })
   @JoinColumn({ name: 'user1_id' })
   user1: User;
 
-  @Column({ type: 'uuid' })
-  user1_id: string;
-
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, user => user.matchesAsUser2, { eager: true })
   @JoinColumn({ name: 'user2_id' })
   user2: User;
 
-  @Column({ type: 'uuid' })
-  user2_id: string;
+  @CreateDateColumn({ name: 'matched_at' })
+  matchedAt: Date;
 
-  @Column()
-  tmdb_movie_id: number;
-
-  @CreateDateColumn()
-  matched_at: Date;
+  @Column('jsonb', { name: 'movie_details' })
+  movieDetails: any;
 }

@@ -1,18 +1,14 @@
-import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-export default registerAs(
-  'database',
-  (): TypeOrmModuleOptions => ({
+export default (): { database: TypeOrmModuleOptions } => ({
+  database: {
     type: 'postgres',
-    host: process.env.POSTGRES_HOST || 'localhost',
-    port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-    username: process.env.POSTGRES_USER || 'postgres',
-    password: process.env.POSTGRES_PASSWORD || 'password',
-    database: process.env.POSTGRES_DB || 'movieapp',
-    synchronize: process.env.NODE_ENV !== 'production',
-    logging: process.env.NODE_ENV !== 'production',
-    entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-  }),
-);
+    host: process.env.POSTGRES_HOST,
+    port: parseInt(process.env.POSTGRES_PORT, 10) || 5432,
+    username: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DB,
+    entities: [__dirname + '/../**/*.entity.{ts,js}'],
+    synchronize: false,
+  },
+});

@@ -22,7 +22,8 @@ import {
   UpdateGroupDto,
   AddUserToGroupDto,
 } from './dto/group.dto';
-import { Group } from 'entities';
+
+import { Group } from '../../entities/group.entity';
 
 @ApiTags('groups')
 @Controller('groups')

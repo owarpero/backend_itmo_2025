@@ -21,7 +21,9 @@ import {
   FriendRequestIdDto,
   UserIdDto,
 } from './dto/friend.dto';
-import { FriendRequest, Friendship } from 'entities';
+
+import { FriendRequest } from '../../entities/friend-request.entity';
+import { Friendship } from '../../entities/friendship.entity';
 
 @ApiTags('friends')
 @Controller('friends')

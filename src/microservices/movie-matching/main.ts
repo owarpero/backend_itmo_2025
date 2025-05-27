@@ -1,53 +1,43 @@
 import { NestFactory } from '@nestjs/core';
-import { MovieMatchingModule } from './movie-matching.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
+import { MovieMatchingModule } from './movie-matching.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(MovieMatchingModule, {
     logger: ['error', 'warn'],
   });
-  const configService = app.get(ConfigService);
+  const cs = app.get(ConfigService);
+  const rmq = cs.get<{ uri: string; queues: Record<string, string> }>(
+    'rabbitmq',
+  );
 
-  // Configure microservice
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: [
-        configService.get<string>('rabbitmq.url', 'amqp://localhost:5672'),
-      ],
-      queue: configService.get<string>(
-        'rabbitmq.queues.movieMatchingService',
-        'movie_matching_queue',
-      ),
-      queueOptions: {
-        durable: true,
-      },
+      urls: [rmq.uri],
+      queue: rmq.queues.movieMatchingService,
+      queueOptions: { durable: true },
     },
   });
 
-  // Global pipes
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
+  const swaggerCfg = new DocumentBuilder()
     .setTitle('Movie Matching Service')
-    .setDescription('The movie matching microservice API description')
+    .setDescription('Movie Matching API')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  const document = SwaggerModule.createDocument(app, swaggerCfg);
+  SwaggerModule.setup(cs.get<string>('SWAGGER_PATH') || 'api', app, document);
 
-  // Start microservice and HTTP server
   await app.startAllMicroservices();
-  await app.listen(configService.get('MOVIE_MATCHING_SERVICE_PORT', 3001));
+  const port = cs.get<number>('PORT') || Number(process.env.PORT) || 3001;
+  await app.listen(port);
 }
+
 bootstrap();

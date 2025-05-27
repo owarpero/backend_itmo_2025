@@ -9,7 +9,8 @@ import * as bcrypt from 'bcryptjs';
 
 import { ConfigService } from '@nestjs/config';
 import { TokenResponse } from './interfaces/token.interface';
-import { User } from 'entities';
+
+import { User } from '../../entities/user.entity';
 
 interface JwtPayload {
   email: string;

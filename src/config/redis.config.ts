@@ -1,7 +1,8 @@
-import { registerAs } from '@nestjs/config';
+import { RedisOptions } from 'ioredis';
 
-export default registerAs('redis', () => ({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379', 10),
-  ttl: parseInt(process.env.REDIS_TTL || '7200', 10), // 2 hours in seconds
-}));
+export default (): { redis: RedisOptions } => ({
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+  },
+});

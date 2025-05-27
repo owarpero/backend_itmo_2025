@@ -8,8 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { ITask } from '../interfaces/entity.interfaces';
-import { TaskType } from 'entities';
-
+import { TaskType } from './task-type.entity';
 @Entity('tasks')
 export class Task implements ITask {
   @PrimaryGeneratedColumn('uuid')

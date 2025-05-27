@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateGroupDto, UpdateGroupDto } from './dto/group.dto';
-import { Group } from 'entities';
+
+import { Group } from '../../entities/group.entity';
 
 @Injectable()
 export class GroupsService {

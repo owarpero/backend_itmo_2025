@@ -1,10 +1,12 @@
 // src/entities/user.entity.ts
-import { Group } from 'entities';
+import { Group } from './group.entity';
+import { MovieMatch } from './movie-match.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
@@ -30,6 +32,13 @@ export class User {
 
   @Column({ type: 'uuid', nullable: true })
   group_id?: string;
+
+  // Обратные связи для MovieMatch
+  @OneToMany(() => MovieMatch, match => match.user1)
+  matchesAsUser1: MovieMatch[];
+
+  @OneToMany(() => MovieMatch, match => match.user2)
+  matchesAsUser2: MovieMatch[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -7,7 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { IAttachment, ISubmission } from '../interfaces/entity.interfaces';
-import { Submission } from 'entities';
+import { Submission } from './submission.entity';
 
 @Entity('attachments')
 export class Attachment implements IAttachment {
