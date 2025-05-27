@@ -2,20 +2,14 @@ import {
   Controller,
   Post,
   Body,
-  UseGuards,
   HttpCode,
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import {
-  RegisterDto,
-  LoginDto,
-  TwoFactorDto,
-  RefreshTokenDto,
-} from './dto/auth.dto';
+
+import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
 import { TokenResponse } from './interfaces/token.interface';
 import { TokenResponseDto } from './dto/token.response.dto';
 
@@ -78,24 +72,24 @@ export class AuthController {
     return this.authService.refreshToken(refreshTokenDto.refresh_token);
   }
 
-  @Post('2fa/setup')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Set up 2FA for user' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns 2FA secret and QR code URL.',
-    type: Object,
-  })
-  async setup2FA(@Body('userId') userId: string) {
-    return this.authService.setup2FA(userId);
-  }
+  // @Post('2fa/setup')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiOperation({ summary: 'Set up 2FA for user' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'Returns 2FA secret and QR code URL.',
+  //   type: Object,
+  // })
+  // async setup2FA(@Body('userId') userId: string) {
+  //   return this.authService.setup2FA(userId);
+  // }
 
-  @Post('2fa/verify')
-  @UseGuards(JwtAuthGuard)
-  @ApiOperation({ summary: 'Verify 2FA token' })
-  @ApiResponse({ status: 200, description: 'Token verified successfully.' })
-  @ApiResponse({ status: 401, description: 'Invalid token.' })
-  async verify2FA(@Body() twoFactorDto: TwoFactorDto): Promise<boolean> {
-    return this.authService.verify2FA(twoFactorDto.userId, twoFactorDto.token);
-  }
+  // @Post('2fa/verify')
+  // @UseGuards(JwtAuthGuard)
+  // @ApiOperation({ summary: 'Verify 2FA token' })
+  // @ApiResponse({ status: 200, description: 'Token verified successfully.' })
+  // @ApiResponse({ status: 401, description: 'Invalid token.' })
+  // async verify2FA(@Body() twoFactorDto: TwoFactorDto): Promise<boolean> {
+  //   return this.authService.verify2FA(twoFactorDto.userId, twoFactorDto.token);
+  // }
 }

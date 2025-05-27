@@ -16,12 +16,13 @@ import {
 } from '@nestjs/swagger';
 import { GroupsService } from './groups.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Group } from './entities/group.entity';
+
 import {
   CreateGroupDto,
   UpdateGroupDto,
   AddUserToGroupDto,
 } from './dto/group.dto';
+import { Group } from 'entities';
 
 @ApiTags('groups')
 @Controller('groups')

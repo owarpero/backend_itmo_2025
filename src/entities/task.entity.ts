@@ -5,8 +5,10 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { ITask, ITaskType } from '../interfaces/entity.interfaces';
+import { ITask } from '../interfaces/entity.interfaces';
+import { TaskType } from 'entities';
 
 @Entity('tasks')
 export class Task implements ITask {
@@ -22,10 +24,11 @@ export class Task implements ITask {
   @Column('text')
   description: string;
 
-  @ManyToOne('TaskType', 'tasks')
-  type: ITaskType;
+  @ManyToOne(() => TaskType, type => type.tasks)
+  @JoinColumn({ name: 'type_id' })
+  type: TaskType;
 
-  @Column()
+  @Column({ type: 'uuid' })
   type_id: string;
 
   @CreateDateColumn()

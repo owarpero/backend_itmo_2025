@@ -6,7 +6,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(MovieDataModule);
+  const app = await NestFactory.create(MovieDataModule, {
+    logger: ['error', 'warn'],
+  });
+
   const configService = app.get(ConfigService);
 
   // Configure microservice

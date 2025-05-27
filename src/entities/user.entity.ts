@@ -1,15 +1,17 @@
+// src/entities/user.entity.ts
+import { Group } from 'entities';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { IUser, IGroup } from '../interfaces/entity.interfaces';
 
 @Entity('users')
-export class User implements IUser {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -22,14 +24,9 @@ export class User implements IUser {
   @Column()
   password_hash: string;
 
-  @Column({ nullable: true })
-  google_2fa_secret?: string;
-
-  @Column({ default: false })
-  is_2fa_enabled: boolean;
-
-  @ManyToOne('Group', 'users', { nullable: true })
-  group?: IGroup;
+  @ManyToOne(() => Group, group => group.users, { nullable: true })
+  @JoinColumn({ name: 'group_id' })
+  group?: Group;
 
   @Column({ type: 'uuid', nullable: true })
   group_id?: string;

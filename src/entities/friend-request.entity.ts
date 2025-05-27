@@ -1,11 +1,12 @@
+import { User } from 'entities';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity('friend_requests')
 export class FriendRequest {
@@ -13,15 +14,17 @@ export class FriendRequest {
   id: string;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'from_user_id' })
   from_user: User;
 
-  @Column()
+  @Column({ type: 'uuid' })
   from_user_id: string;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'to_user_id' })
   to_user: User;
 
-  @Column()
+  @Column({ type: 'uuid' })
   to_user_id: string;
 
   @CreateDateColumn()

@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Group } from './entities/group.entity';
+
 import { CreateGroupDto, UpdateGroupDto } from './dto/group.dto';
+import { Group } from 'entities';
 
 @Injectable()
 export class GroupsService {

@@ -1,151 +1,163 @@
 services:
+  # Postgres: создаём сразу три роли+базы movieapp, auth, users
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_MULTIPLE_DATABASES: movieapp,auth,users
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      retries: 5
+
+  # Redis
+  redis:
+    image: redis:8-alpine
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 5
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmqctl', 'status']
+      interval: 5s
+      retries: 5
+
   # Movie Matching Service
   movie-matching:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.movie-matching
+    container_name: movie-matching
     ports:
       - '3001:3001'
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=movieapp
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
-      movie-data:
-        condition: service_started
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: movieapp
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movieapp
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBIT_URI: amqp://user:password@rabbitmq
+    command: ['node', 'dist/microservices/movie-matching/main.js']
 
   # Movie Data Service
   movie-data:
     build:
       context: .
       dockerfile: Dockerfile.movie-data
+    container_name: movie-data
     ports:
       - '3004:3004'
-    environment:
-      - NODE_ENV=development
-      - PORT=3004
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=movieapp
-      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
-      - TMDB_ACCESS_TOKEN=${TMDB_ACCESS_TOKEN}
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: movieapp
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movieapp
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBIT_URI: amqp://user:password@rabbitmq
+      TMDB_ACCESS_TOKEN: ${TMDB_ACCESS_TOKEN}
+    command: ['node', 'dist/microservices/movie-data/main.js']
 
   # Auth Service
   auth:
     build:
       context: .
       dockerfile: Dockerfile.auth
+    container_name: auth
     ports:
       - '3002:3002'
-    environment:
-      - NODE_ENV=development
-      - PORT=3002
-      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=auth
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=your_jwt_secret_key_here
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auth
+      RABBIT_URI: amqp://user:password@rabbitmq
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    command: ['node', 'dist/microservices/auth/main.js']
 
   # User Service
   user:
     build:
       context: .
       dockerfile: Dockerfile.user
+    container_name: user
     ports:
       - '3003:3003'
-    environment:
-      - NODE_ENV=development
-      - PORT=3003
-      - RABBITMQ_URL=amqp://user:password@rabbitmq:5672
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=users
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - JWT_SECRET=your_jwt_secret_key_here
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       postgres:
         condition: service_healthy
       redis:
-        condition: service_started
-
-  # PostgreSQL
-  postgres:
-    image: postgres:latest
-    ports:
-      - '5432:5432'
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_MULTIPLE_DATABASES=movieapp,auth,users
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  # Redis
-  redis:
-    image: redis:alpine
-    ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-
-  # RabbitMQ
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-    environment:
-      - RABBITMQ_DEFAULT_USER=user
-      - RABBITMQ_DEFAULT_PASS=password
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', 'check_port_connectivity']
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      NODE_ENV: development
+      PORT: 3003
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: users
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBIT_URI: amqp://user:password@rabbitmq
+    command: ['node', 'dist/microservices/users/main.js']
 
 volumes:
   postgres_data:

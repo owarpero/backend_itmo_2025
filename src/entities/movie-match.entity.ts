@@ -1,11 +1,12 @@
+import { User } from 'entities';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity('movie_matches')
 export class MovieMatch {
@@ -13,15 +14,17 @@ export class MovieMatch {
   id: string;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'user1_id' })
   user1: User;
 
-  @Column()
+  @Column({ type: 'uuid' })
   user1_id: string;
 
   @ManyToOne(() => User)
+  @JoinColumn({ name: 'user2_id' })
   user2: User;
 
-  @Column()
+  @Column({ type: 'uuid' })
   user2_id: string;
 
   @Column()

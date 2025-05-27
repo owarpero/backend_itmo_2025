@@ -4,9 +4,8 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FriendRequest, Friendship } from 'entities';
 import { Repository } from 'typeorm';
-import { FriendRequest } from './entities/friend-request.entity';
-import { Friendship } from './entities/friendship.entity';
 
 @Injectable()
 export class FriendsService {

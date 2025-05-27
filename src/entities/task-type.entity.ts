@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { ITaskType, ITask } from '../interfaces/entity.interfaces';
+import { ITaskType } from '../interfaces/entity.interfaces';
+import { Task } from 'entities';
 
 @Entity('task_types')
 export class TaskType implements ITaskType {
@@ -12,6 +13,6 @@ export class TaskType implements ITaskType {
   @Column()
   code: string;
 
-  @OneToMany('Task', 'type')
-  tasks: ITask[];
+  @OneToMany(() => Task, task => task.type)
+  tasks: Task[];
 }

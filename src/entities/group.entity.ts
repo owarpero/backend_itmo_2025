@@ -1,14 +1,15 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { IGroup, IUser } from '../interfaces/entity.interfaces';
+import { IUser } from '../interfaces/entity.interfaces';
+import { User } from 'entities';
 
 @Entity('groups')
-export class Group implements IGroup {
+export class Group {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
   name: string;
 
-  @OneToMany('User', 'group')
+  @OneToMany(() => User, user => user.group)
   users: IUser[];
 }

@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from '../microservices/redis/redis.module';
-import * as Redis from 'ioredis';
+import Redis from 'ioredis';
 
 export async function setupTestApp(): Promise<INestApplication> {
   const moduleFixture: TestingModule = await Test.createTestingModule({

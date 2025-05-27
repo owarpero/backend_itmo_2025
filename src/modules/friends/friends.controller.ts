@@ -15,13 +15,13 @@ import {
 } from '@nestjs/swagger';
 import { FriendsService } from './friends.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { FriendRequest } from './entities/friend-request.entity';
-import { Friendship } from './entities/friendship.entity';
+
 import {
   FriendRequestDto,
   FriendRequestIdDto,
   UserIdDto,
 } from './dto/friend.dto';
+import { FriendRequest, Friendship } from 'entities';
 
 @ApiTags('friends')
 @Controller('friends')

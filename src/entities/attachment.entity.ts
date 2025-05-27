@@ -4,18 +4,21 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 import { IAttachment, ISubmission } from '../interfaces/entity.interfaces';
+import { Submission } from 'entities';
 
 @Entity('attachments')
 export class Attachment implements IAttachment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne('Submission', 'attachments')
+  @ManyToOne(() => Submission, submission => submission.attachments)
+  @JoinColumn({ name: 'submission_id' })
   submission: ISubmission;
 
-  @Column()
+  @Column({ type: 'uuid' })
   submission_id: string;
 
   @Column()

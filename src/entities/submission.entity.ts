@@ -3,9 +3,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import {
   ISubmission,
@@ -13,22 +14,25 @@ import {
   ITask,
   IAttachment,
 } from '../interfaces/entity.interfaces';
+import { Attachment, Task, User } from 'entities';
 
 @Entity('submissions')
 export class Submission implements ISubmission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne('User')
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user_id' })
   user: IUser;
 
-  @Column()
+  @Column({ type: 'uuid' })
   user_id: string;
 
-  @ManyToOne('Task')
+  @ManyToOne(() => Task)
+  @JoinColumn({ name: 'task_id' })
   task: ITask;
 
-  @Column()
+  @Column({ type: 'uuid' })
   task_id: string;
 
   @Column()
@@ -37,7 +41,7 @@ export class Submission implements ISubmission {
   @Column()
   original_filename: string;
 
-  @OneToMany('Attachment', 'submission')
+  @OneToMany(() => Attachment, attachment => attachment.submission)
   attachments: IAttachment[];
 
   @CreateDateColumn()

@@ -6,10 +6,10 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcryptjs';
-import * as speakeasy from 'speakeasy';
-import { User } from '../users/entities/user.entity';
+
 import { ConfigService } from '@nestjs/config';
 import { TokenResponse } from './interfaces/token.interface';
+import { User } from 'entities';
 
 interface JwtPayload {
   email: string;
@@ -88,37 +88,37 @@ export class AuthService {
     }
   }
 
-  async setup2FA(
-    userId: string,
-  ): Promise<{ secret: string; otpauthUrl: string }> {
-    const secret = speakeasy.generateSecret({
-      name: 'MovieMatch',
-    });
+  // async setup2FA(
+  //   userId: string,
+  // ): Promise<{ secret: string; otpauthUrl: string }> {
+  //   const secret = speakeasy.generateSecret({
+  //     name: 'MovieMatch',
+  //   });
 
-    await this.usersService.update2FASecret(userId, secret.base32);
+  //   await this.usersService.update2FASecret(userId, secret.base32);
 
-    return {
-      secret: secret.base32,
-      otpauthUrl: secret.otpauth_url || '',
-    };
-  }
+  //   return {
+  //     secret: secret.base32,
+  //     otpauthUrl: secret.otpauth_url || '',
+  //   };
+  // }
 
-  async verify2FA(userId: string, token: string): Promise<boolean> {
-    const user = await this.usersService.findOne(userId);
-    if (!user.google_2fa_secret) {
-      throw new UnauthorizedException('2FA not set up');
-    }
+  // async verify2FA(userId: string, token: string): Promise<boolean> {
+  //   const user = await this.usersService.findOne(userId);
+  //   if (!user.google_2fa_secret) {
+  //     throw new UnauthorizedException('2FA not set up');
+  //   }
 
-    const verified = speakeasy.totp.verify({
-      secret: user.google_2fa_secret,
-      encoding: 'base32',
-      token,
-    });
+  //   const verified = speakeasy.totp.verify({
+  //     secret: user.google_2fa_secret,
+  //     encoding: 'base32',
+  //     token,
+  //   });
 
-    if (verified) {
-      await this.usersService.enable2FA(userId);
-    }
+  //   if (verified) {
+  //     await this.usersService.enable2FA(userId);
+  //   }
 
-    return verified;
-  }
+  //   return verified;
+  // }
 }

@@ -1,25 +1,31 @@
-FROM node:18-alpine
-
+# ==== Stage 1: сборка ====
+FROM node:18-alpine AS builder
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# копируем манифесты и tsconfig
+COPY package*.json tsconfig*.json ./
 
-# Install dependencies including RabbitMQ packages
-RUN npm install && \
-    npm install amqp-connection-manager @types/amqplib
+# ставим все зависимости (включая dev)
+RUN npm install
 
-# Copy source code
+# копируем исходники и билдим весь проект
 COPY . .
-
-# Build TypeScript
 RUN npm run build
 
-# Create dist directory structure
-RUN mkdir -p /app/dist/microservices/movie-data
+# ==== Stage 2: production-образ ====
+FROM node:18-alpine
+WORKDIR /app
 
-# Expose port
-EXPOSE 3004
+# ставим только prod-зависимости и гасим хуск
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
 
-# Start the movie data service
-CMD ["node", "dist/microservices/movie-data/main.js"] 
+# копируем готовый JS
+COPY --from=builder /app/dist ./dist
+
+# выставляем порт (3001/3004/3002/3003)
+EXPOSE 3000
+
+# и запускаем нужный сервис
+
+CMD ["node", "dist/microservices/movie-data/main.js"]
