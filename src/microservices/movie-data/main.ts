@@ -7,9 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { MovieDataModule } from './movie-data.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(MovieDataModule, {
-    logger: ['error', 'warn'],
-  });
+  const app = await NestFactory.create(MovieDataModule);
   const cs = app.get(ConfigService);
   const rmq = cs.get<{ uri: string; queues: Record<string, string> }>(
     'rabbitmq',

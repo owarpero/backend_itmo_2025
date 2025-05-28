@@ -13,7 +13,7 @@ async function bootstrap() {
   // 2) run any pending migrations
   await dataSource.runMigrations();
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn'],
+    logger: ['log', 'error', 'warn', 'debug'],
   });
   const cs = app.get(ConfigService);
   const rmq = cs.get<{ uri: string; queues: Record<string, string> }>(

@@ -4,10 +4,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtConfig } from '../../../config/auth.config';
 import { UserPayload } from '../../../common/interfaces/user.interface';
+import { UUID } from 'node:crypto';
 
 interface JwtPayload {
   email: string;
-  sub: string;
+  sub: UUID;
 }
 
 @Injectable()

@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 
 import { User } from '../../entities/user.entity';
+import { UserProfileDto } from '../users/dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -41,6 +42,22 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async getProfile(userId: string): Promise<UserProfileDto> {
+    const user = await this.findOne(userId);
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      matchesAsUser1: user.matchesAsUser1,
+      matchesAsUser2: user.matchesAsUser2,
+      group: user.group,
+      group_id: user.group_id,
+      // is_2fa_enabled: user.is_2fa_enabled,
+      // google_2fa_secret: user.google_2fa_secret,
+    };
+  }
   // async update2FASecret(userId: string, secret: string): Promise<void> {
   //   await this.usersRepository.update(userId, {
   //     google_2fa_secret: secret,

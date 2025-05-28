@@ -1,19 +1,17 @@
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class FriendRequestDto {
-  @ApiProperty()
   @IsString()
-  fromUserId: string;
-
+  @IsUUID()
   @ApiProperty()
-  @IsString()
   toUserId: string;
 }
 
 export class FriendRequestIdDto {
-  @ApiProperty()
   @IsString()
+  @IsUUID()
+  @ApiProperty()
   requestId: string;
 }
 

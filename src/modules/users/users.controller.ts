@@ -1,46 +1,34 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
-import { UsersService } from './users.service';
+import { Logger } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-import { UserIdDto } from './dto/user.dto';
+import { UsersService } from './users.service';
+import { UserProfileDto } from './dto/user.dto';
+import { GetUser } from '../../common/decorators/get-user.decorator';
 
-import { User } from '../../entities/user.entity';
-@ApiTags('users')
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
+
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiResponse({ status: 200, description: 'Returns the user.', type: User })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async findOne(@Param() params: UserIdDto): Promise<User> {
-    return this.usersService.findOne(params.userId);
+  async profile(@GetUser() user: { userId: string }): Promise<UserProfileDto> {
+    console.log('>>> profile() reached, user =', user);
+    this.logger.log(`profile() reached, userId=${user?.userId}`);
+    if (!user?.userId) {
+      throw new Error('User not authenticated');
+    }
+    return this.usersService.getProfile(user.userId);
   }
 
-  //   @Post('2fa/enable')
-  //   @UseGuards(JwtAuthGuard)
-  //   @ApiBearerAuth()
-  //   @ApiOperation({ summary: 'Enable 2FA for user' })
-  //   @ApiResponse({ status: 200, description: '2FA enabled successfully.' })
-  //   async enable2FA(@Body() params: UserIdDto): Promise<void> {
-  //     await this.usersService.enable2FA(params.userId);
-  //   }
-
-  //   @Post('2fa/disable')
-  //   @UseGuards(JwtAuthGuard)
-  //   @ApiBearerAuth()
-  //   @ApiOperation({ summary: 'Disable 2FA for user' })
-  //   @ApiResponse({ status: 200, description: '2FA disabled successfully.' })
-  //   async disable2FA(@Body() params: UserIdDto): Promise<void> {
-  //     await this.usersService.disable2FA(params.userId);
-  //   }
+  // 2) Динамический роут — только после “me”
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Param('id') id: string) {
+    console.log('>>> findOne() reached, id =', id);
+    this.logger.log(`findOne() reached, id=${id}`);
+    return this.usersService.findOne(id);
+  }
 }
