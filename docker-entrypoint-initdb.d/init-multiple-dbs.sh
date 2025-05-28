@@ -1,18 +1,9 @@
-# docker-entrypoint-initdb.d/init-multiple-dbs.sh
-#!/usr/bin/env bash
-set -eo pipefail
+# #!/bin/sh
+# set -e
 
-# Не падаем, если переменная не задана
-: "${POSTGRES_MULTIPLE_DATABASES:=}"
-IFS=',' read -ra DBS <<< "$POSTGRES_MULTIPLE_DATABASES"
+# echo "==> Applying database migrations…"
+# # Запустим миграции на скомпилированном датасорсе
+# npx typeorm migration:run -d dist/data-source.js
 
-for db in "${DBS[@]}"; do
-  if [[ -n "$db" ]]; then
-    echo "=> Create user+db '$db'"
-    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-      CREATE USER $db WITH PASSWORD '$POSTGRES_PASSWORD';
-      CREATE DATABASE $db OWNER $db;
-      GRANT ALL PRIVILEGES ON DATABASE $db TO $db;
-EOSQL
-  fi
-done
+# echo "==> Launching app…"
+# exec "$@"

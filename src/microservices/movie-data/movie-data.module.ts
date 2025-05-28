@@ -10,8 +10,8 @@ import authConfig from '../../config/auth.config';
 import { MovieDataService } from './movie-data.service';
 import { MovieDataController } from './movie-data.controller';
 
-import { Movie } from './entities/movie.entity';
-import { Genre } from './entities/genre.entity';
+import { Movie } from '../../entities/movie.entity';
+import { Genre } from '../../entities/genre.entity';
 
 @Module({
   imports: [

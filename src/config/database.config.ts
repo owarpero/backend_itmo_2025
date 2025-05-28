@@ -9,6 +9,8 @@ export default (): { database: TypeOrmModuleOptions } => ({
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
     entities: [__dirname + '/../**/*.entity.{ts,js}'],
+    migrations: [__dirname + '/../migration/*.{ts,js}'],
     synchronize: false,
+    migrationsRun: true,
   },
 });

@@ -8,7 +8,7 @@ import redisConfig from '../../config/redis.config';
 import rabbitmqConfig from '../../config/rabbitmq.config';
 import { RedisModule } from '../redis/redis.module';
 
-import { MovieMatch } from './entities/movie-match.entity';
+import { MovieMatch } from '../../entities/movie-match.entity';
 import { MovieMatchingService } from './movie-matching.service';
 import { MovieMatchingController } from './movie-matching.controller';
 

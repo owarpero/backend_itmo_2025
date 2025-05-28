@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
-import { MovieMatch } from './entities/movie-match.entity';
+import { MovieMatch } from '../../entities/movie-match.entity';
 import { CreateSessionDto } from './dto/movie-match.dto';
 
 @Injectable()

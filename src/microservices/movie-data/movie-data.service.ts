@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { Movie } from './entities/movie.entity';
-import { Genre } from './entities/genre.entity';
+import { Movie } from '../../entities/movie.entity';
+import { Genre } from '../../entities/genre.entity';
 import { firstValueFrom } from 'rxjs';
 
 interface TMDBGenreResponse {
@@ -137,7 +137,7 @@ export class MovieDataService {
       const genres = await this.genreRepository.findBy({
         tmdb_id: In(data.genres.map(g => g.id)),
       });
-
+      console.log('Genres found:', data, genres);
       return this.movieRepository.save({
         tmdb_id: data.id,
         title: data.title,

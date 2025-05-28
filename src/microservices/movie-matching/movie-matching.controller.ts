@@ -15,7 +15,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { MovieMatchingService } from './movie-matching.service';
-import { MovieMatch } from './entities/movie-match.entity';
+import { MovieMatch } from '../../entities/movie-match.entity';
 import { CreateSessionDto, MovieQueueDto } from './dto/movie-match.dto';
 import { MessagePattern } from '@nestjs/microservices';
 import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';

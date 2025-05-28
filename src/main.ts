@@ -5,8 +5,13 @@ import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module';
+import dataSource from './data-source';
 
 async function bootstrap() {
+  await dataSource.initialize();
+
+  // 2) run any pending migrations
+  await dataSource.runMigrations();
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn'],
   });

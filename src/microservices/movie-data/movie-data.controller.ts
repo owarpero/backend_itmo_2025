@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MovieDataService } from './movie-data.service';
-import { Movie } from './entities/movie.entity';
-import { Genre } from './entities/genre.entity';
+import { Movie } from '../../entities/movie.entity';
+import { Genre } from '../../entities/genre.entity';
 import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('movie-data')
