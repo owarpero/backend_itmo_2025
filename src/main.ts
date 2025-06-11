@@ -51,14 +51,6 @@ async function bootstrap() {
       queueOptions: { durable: true },
     },
   });
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.RMQ,
-    options: {
-      urls: [rmq.uri],
-      queue: rmq.queues.authService,
-      queueOptions: { durable: true },
-    },
-  });
 
   await app.startAllMicroservices();
   const port = cs.get<number>('PORT') || Number(process.env.PORT) || 3000;

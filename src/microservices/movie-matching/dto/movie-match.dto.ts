@@ -6,6 +6,7 @@ import {
   IsOptional,
   ValidateNested,
   IsArray,
+  IsNotEmpty,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -23,30 +24,33 @@ export class MovieDetailsDto {
   @IsString()
   release_date: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   overview?: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
   vote_average?: number;
 }
 
 export class CreateSessionDto {
-  @ApiProperty({ description: 'UUID of the first user' })
+  @ApiProperty({ description: 'First user ID' })
   @IsUUID()
+  @IsNotEmpty()
   user1_id: string;
 
-  @ApiProperty({ description: 'UUID of the second user' })
+  @ApiProperty({ description: 'Second user ID' })
   @IsUUID()
+  @IsNotEmpty()
   user2_id: string;
 }
 
 export class MoviePreferenceDto {
   @ApiProperty({ description: 'UUID of the user making the preference' })
   @IsUUID()
+  @IsNotEmpty()
   userId: string;
 
   @ApiProperty({ description: 'TMDb movie ID' })
@@ -62,11 +66,15 @@ export class MoviePreferenceDto {
 }
 
 export class MovieQueueDto {
-  @ApiProperty({
-    description: 'Array of TMDb movie IDs to add to the session queue',
-    type: [Number],
-  })
+  @ApiProperty({ description: 'Array of TMDb movie IDs', type: [Number] })
   @IsArray()
   @IsNumber({}, { each: true })
   movieIds: number[];
+}
+
+export class MovieReactionDto {
+  @ApiProperty({ description: 'TMDb movie ID' })
+  @IsNumber()
+  @IsNotEmpty()
+  movieId: number;
 }
